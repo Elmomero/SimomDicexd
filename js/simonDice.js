@@ -1,18 +1,30 @@
-export default function simonDice(botones, botonesMostrados) {
-    const $botones = document.querySelectorAll(botones);
-    const $botonesMostrados = document.querySelectorAll(botonesMostrados);
-    let contadorPatron = 0,
-        posActual = 0,
+export default function simonDice(botones, botonesMostrados, focos) {
+    //recibe como parametro los botones que se aplastan, los que se muestran y los focos que se van a prender
+    const $botones = document.querySelectorAll(botones),
+          $botonesMostrados = document.querySelectorAll(botonesMostrados),
+          $focos = document.querySelectorAll(focos);
+          
+    let contadorAciertos = 0,
+        botonSeleccionado,
         arregloSeleccionado = [],
         arregloMostrado = [];
-    const generarAleatorio = () => {
-        return parseInt(Math.random() * 9);
+    const generarAleatorio = () => parseInt(Math.random() * 9);
+    
+    const reiniciarJuego = () =>{
+        arregloMostrado = [];
+        arregloSeleccionado = [];
+        contadorAciertos = 0;
+        apagarFocos();
+        mostrarPatron(arregloMostrado);
     }
-    const desactivarBotones = () =>{
-        $botones.forEach(boton => boton.disabled = true);
-    }
-    const activarBotones = () =>
-        $botones.forEach(boton => boton.disabled = false);
+    const alumbrarFocos = (pos) => $focos[pos-1].style.backgroundColor = "#01b900"; 
+    
+    const apagarFocos = () => $focos.forEach((foco) => foco.style.backgroundColor = "#ccc");
+
+    const desactivarBotones = () => $botones.forEach(boton => boton.disabled = true);
+        
+    const activarBotones = () => $botones.forEach(boton => boton.disabled = false);
+
     
     const compararArreglos = (arr1,arr2) =>{
         let iguales = true;
@@ -35,51 +47,62 @@ export default function simonDice(botones, botonesMostrados) {
             let timer = setTimeout(() => {
                 div.style.backgroundColor = "#000";
                 div.style.borderRadius = "3px";
+                clearTimeout(timer);
             }, 700);
         });
     }
+    // muestra el patron en el panel de muestra
     const mostrarPatron = (arregloMostr) => {
         desactivarBotones();
-        posActual = generarAleatorio();
-        arregloMostr.push(posActual);
+        botonSeleccionado = generarAleatorio();
+        arregloMostr.push(botonSeleccionado);
         arregloMostr.forEach((pos,i)=>{
             let $btn_mostrado = $botonesMostrados[pos];
             let timing = setTimeout(() => {
                 $btn_mostrado.style.backgroundColor = "#42a6fc";
-                // console.log("se ejecuta el primer timing");
                 clearTimeout(timing);
             }, (i+1)*1500);
             let timingGrande = setTimeout(() => {
                 let timing2 = setTimeout(() => {
                     $btn_mostrado.style.backgroundColor = "#000";
-                    // console.log("se ejecuta el segundo timing");
                     clearTimeout(timing2);
+                    if(arregloMostr.length === i+1) activarBotones();
                 }, (i+1) *1500);
-                // console.log("se ejecuta el timing grande");
                 clearTimeout(timingGrande);
             }, 500);
             
         });
         
     }
-   mostrarPatron(arregloMostrado);
-   activarBotones();
-    $botones.forEach((boton) => {
-        boton.addEventListener("click", (e) => {
-            arregloSeleccionado.push(boton.dataset.pos);
-            if (compararArreglos(arregloMostrado,arregloSeleccionado)) {
-                mostrarPatron(arregloMostrado);
-                activarBotones();
-                arregloSeleccionado = [];
-            }
-            if(!compararArreglos(arregloSeleccionado,arregloMostrado) && arregloSeleccionado.length === arregloMostrado.length){
-                errorPatron();
-                arregloMostrado = [];
-                arregloSeleccionado = [];
-                mostrarPatron(arregloMostrado);
-                activarBotones();
-            }
-
+    
+    mostrarPatron(arregloMostrado);
+        $botones.forEach((boton) => {
+            boton.addEventListener("click", () => {
+                
+                arregloSeleccionado.push(boton.dataset.pos);    
+                
+                if (compararArreglos(arregloMostrado,arregloSeleccionado)) {
+                    if(contadorAciertos === 4){
+                        alumbrarFocos(5);
+                        setTimeout(() => {
+                            reiniciarJuego();
+                        }, 1000);
+                    } 
+                    else{
+                        contadorAciertos++; 
+                        mostrarPatron(arregloMostrado);
+                        arregloSeleccionado = [];
+                        alumbrarFocos(contadorAciertos);
+                    }
+                }
+                if(!compararArreglos(arregloSeleccionado,arregloMostrado) && arregloSeleccionado.length === arregloMostrado.length){
+                    errorPatron();
+                    reiniciarJuego();
+                }
+    
+            });
         });
-    });
+         
+         
+    
 }
