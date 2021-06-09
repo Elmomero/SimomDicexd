@@ -92,8 +92,10 @@ body{
                 8px 8px 2px #414141d5 inset,
                 -8px -8px 2px #414141d5 inset;
     outline: 0;
-    
+    width: 87px;
+    height: 87px;
 }
+
 .boton:nth-child(n+7){
     margin-bottom: 10px;
 }
@@ -107,15 +109,29 @@ body{
 @media screen and (max-width:945px) {
     .contenedor{
         height: auto;     
+        flex-direction: column;
     }
     .contenedor__secciones{
         width: 300px;
         height: 350px;
+        margin-bottom: 50px;
         
     }
     .botones{
         width: 200px;
         height: 200px;
+    }
+    .boton{
+        width: 54px;
+        height: 54px;
+        box-shadow: 1px 1px 1px #232323,
+                -1px -1px 1px #232323,
+                5px 5px 1px #414141d5 inset,
+                -5px -5px 1px #414141d5 inset;
+    }
+    .foco{
+        width: 20px;
+        height: 20px;
     }
 }
 
